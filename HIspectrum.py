@@ -18,7 +18,8 @@ class HIspectrum:
         self.blin = np.array(tdata['BASELINE'])
         self.meta = tdata.meta #ordered dict
         self.obname = self.meta['OBJECT']
-        self.roi = None #region of interest for data reduction
+        self.roi_left, self.roi_right = 0.0,0.0 #boundaries of roi
+        self.roi = None #indices (array) region of interest for data reduction
             
     def display(self, vlim=[None, None], f_name=None, v21=False):
         """plot the Spectrum, vlim is velo limits. If f_name is specified, save figure there."""
@@ -57,24 +58,25 @@ class HIspectrum:
             print("Region of interest undefined!")
             I = None
         return I
-
+    
     def mouse_roi(self):
-        self.roi = None
+        """Set the roi using mouse events"""
         fig, ax = plt.subplots()
         ax.plot(self.velo, self.flux)
         ctr = self.meta['V21SYS']
         ax.set_xlim(ctr-500, ctr+500)
         fig.suptitle("Setting ROI")
-        event_list = list()
-        def onclick(event):
-            if event.dblclick:
-                fig.canvas.mpl_disconnect(cid)
+        def onclick1(event):
+            if event.button == 3:
+                self.roi_right = event.xdata 
+            elif event.button == 1:
+                self.roi_left = event.xdata
             else:
-                event_list.append(event.xdata)
-       
-        cid = fig.canvas.mpl_connect('button_press_event', onclick)
+                pass
+                
+            print(self.roi_left, self.roi_right)
+        cid = fig.canvas.mpl_connect('button_press_event', onclick1)
         plt.show() # think this blocks until the canvas is dropped 
-
         fig.canvas.mpl_disconnect(cid)
-        print(event_list)
-
+        # actually set the indices for the region:
+        self.roi = (self.velo > self.roi_left) & (self.velo < self.roi_right)
