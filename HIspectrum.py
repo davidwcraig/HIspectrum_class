@@ -57,3 +57,24 @@ class HIspectrum:
             print("Region of interest undefined!")
             I = None
         return I
+
+    def mouse_roi(self):
+        self.roi = None
+        fig, ax = plt.subplots()
+        ax.plot(self.velo, self.flux)
+        ctr = self.meta['V21SYS']
+        ax.set_xlim(ctr-500, ctr+500)
+        fig.suptitle("Setting ROI")
+        event_list = list()
+        def onclick(event):
+            if event.dblclick:
+                break
+            else:
+                event_list.append(event.xdata)
+       
+        cid = fig.canvas.mpl_connect('button_press_event', onclick)
+        plt.show() # think this blocks until the canvas is dropped 
+
+        fig.canvas.mpl_disconnect(cid)
+        print(event_list)
+
