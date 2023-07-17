@@ -68,7 +68,7 @@ class HIspectrum:
         event_list = list()
         def onclick(event):
             if event.dblclick:
-                break
+                fig.canvas.mpl_disconnect(cid)
             else:
                 event_list.append(event.xdata)
        
