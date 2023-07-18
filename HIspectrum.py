@@ -84,13 +84,16 @@ class HIspectrum:
         self.roi = (self.velo > self.roi_left) & (self.velo < self.roi_right)
 
     def mouse_returnx(self):
+        lastx = -999.0
         fig, ax = plt.subplots()
         ax.plot(self.velo, self.flux)
         ctr = self.meta['V21SYS']
         ax.set_xlim(ctr-500, ctr+500)
         def onclick(event):
+            nonlocal lastx
             if event.button == 1:
                 print(event.xdata)
-                self.lastx = event.xdata
+                lastx = event.xdata
         cid = fig.canvas.mpl_connect('button_press_event', onclick)
         plt.show()
+        return lastx  # I think this will only finish on close.
