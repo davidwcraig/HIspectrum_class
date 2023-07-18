@@ -21,7 +21,7 @@ class HIspectrum:
         self.roi_left, self.roi_right = 0.0,0.0 #boundaries of roi
         self.roi = None #indices (array) region of interest for data reduction
             
-    def display(self, vlim=[None, None], f_name=None, v21=False):
+    def display(self, vlim=[None, None], f_name=None, v21=True):
         """plot the Spectrum, vlim is velo limits. If f_name is specified, save figure there."""
         fig, ax1 = plt.subplots()
         ax1.plot(self.velo, self.flux)
@@ -72,7 +72,7 @@ class HIspectrum:
             elif event.button == 1:
                 self.roi_left = event.xdata
             else:
-                pass
+                return
                 
             print(self.roi_left, self.roi_right)
         cid = fig.canvas.mpl_connect('button_press_event', onclick1)
