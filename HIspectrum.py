@@ -20,6 +20,7 @@ class HIspectrum:
         self.obname = self.meta['OBJECT']
         self.roi_left, self.roi_right = 0.0,0.0 #boundaries of roi
         self.roi = None #indices (array) region of interest for data reduction
+        self.lastx = -999.0 # last x location clicked in spectrum
             
     def display(self, vlim=[None, None], f_name=None, v21=True):
         """plot the Spectrum, vlim is velo limits. If f_name is specified, save figure there."""
@@ -37,6 +38,7 @@ class HIspectrum:
             plt.fill_between(self.velo[self.roi], self.flux[self.roi], color='red', alpha=0.2)
         if f_name is not None:
             plt.savefig(f_name)
+        # TODO: try to put a fig closeer here with a callback?
         plt.show()
             
         
@@ -80,3 +82,15 @@ class HIspectrum:
         fig.canvas.mpl_disconnect(cid)
         # actually set the indices for the region:
         self.roi = (self.velo > self.roi_left) & (self.velo < self.roi_right)
+
+    def mouse_returnx(self):
+        fig, ax = plt.subplots()
+        ax.plot(self.velo, self.flux)
+        ctr = self.meta['V21SYS']
+        ax.set_xlim(ctr-500, ctr+500)
+        def onclick(event):
+            if event.button == 1:
+                print(event.xdata)
+                self.lastx = event.xdata
+        cid = fig.canvas.mpl_connect('button_press_event', onclick)
+        plt.show()
