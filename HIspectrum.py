@@ -62,6 +62,10 @@ class HIspectrum:
         return I
     
     def mouse_roi(self):
+        """Set the region of interest (roi) for integration, etc. by mouse."""
+        lastx1, lastx2 = -999.0, -999.0 # value of last mouse click
+        m_accept = False
+        m_done = False
         """Set the roi using mouse events"""
         fig, ax = plt.subplots()
         ax.plot(self.velo, self.flux)
@@ -69,21 +73,37 @@ class HIspectrum:
         ax.set_xlim(ctr-500, ctr+500)
         fig.suptitle("Setting ROI")
         def onclick1(event):
-            if event.button == 3:
-                self.roi_right = event.xdata 
-            elif event.button == 1:
-                self.roi_left = event.xdata
+            nonlocal lastx1, lastx2, m_done
+            if event.button == 1:
+                print("Clicked x1: ", event.xdata)
+                lastx1 = event.xdata
+            elif event.button == 3:
+                print("Clicked x2: ", event.xdata)
+                lastx2 = event.xdata
+            elif event.button == 2:
+                print('Saving bounds!')
+                plt.close() # close the window
+                m_done = True
             else:
-                return
-                
-            print(self.roi_left, self.roi_right)
+                pass # needed?
+
         cid = fig.canvas.mpl_connect('button_press_event', onclick1)
+        # Give the user help:
+        print("""Left mouse click to set lower v,
+        Right mouse click to set upper v,
+        Center click to accept""")
         plt.show() # think this blocks until the canvas is dropped 
         fig.canvas.mpl_disconnect(cid)
+        self.roi = (self.velo > lastx1) & (self.velo < lastx2)
         # actually set the indices for the region:
-        self.roi = (self.velo > self.roi_left) & (self.velo < self.roi_right)
+        if m_done:
+            print("ROI bounds set for {:s} {:5.1f} to {:5.1f}".format(self.obname,lastx1,lastx2))
+            self.display() # display again. Should show ROI
+            return
+
 
     def mouse_returnx(self):
+        """simply returns the last clicked x value, test method."""
         lastx = -999.0
         fig, ax = plt.subplots()
         ax.plot(self.velo, self.flux)
