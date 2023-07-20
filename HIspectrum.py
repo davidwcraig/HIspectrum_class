@@ -64,7 +64,6 @@ class HIspectrum:
     def mouse_roi(self):
         """Set the region of interest (roi) for integration, etc. by mouse."""
         lastx1, lastx2 = -999.0, -999.0 # value of last mouse click
-        m_accept = False
         m_done = False
         """Set the roi using mouse events"""
         fig, ax = plt.subplots()
@@ -94,8 +93,8 @@ class HIspectrum:
         Center click to accept""")
         plt.show() # think this blocks until the canvas is dropped 
         fig.canvas.mpl_disconnect(cid)
-        self.roi = (self.velo > lastx1) & (self.velo < lastx2)
         # actually set the indices for the region:
+        self.roi = (self.velo > lastx1) & (self.velo < lastx2)
         if m_done:
             print("ROI bounds set for {:s} {:5.1f} to {:5.1f}".format(self.obname,lastx1,lastx2))
             self.display() # display again. Should show ROI
